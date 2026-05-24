@@ -1,4 +1,4 @@
-import { GameMap, MapTile, TerrainType } from './types';
+import { GameMap, MapTile, TerrainType, TreeSize } from './types';
 
 const MAP_WIDTH = 80;
 const MAP_HEIGHT = 60;
@@ -22,6 +22,13 @@ function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function randomTreeSize(): TreeSize {
+  const roll = Math.random();
+  if (roll < 0.35) return TreeSize.SMALL;
+  if (roll < 0.7) return TreeSize.MEDIUM;
+  return TreeSize.LARGE;
+}
+
 function generateRiver(
   tiles: MapTile[][],
   startY: number,
@@ -31,7 +38,6 @@ function generateRiver(
   let y = startY;
 
   if (horizontal) {
-    // River flows left to right
     x = 0;
     for (let step = 0; step < MAP_WIDTH; step++) {
       const width = randomInt(2, 4);
@@ -45,7 +51,6 @@ function generateRiver(
           };
         }
       }
-      // Add dirt banks
       for (let dy = -1; dy <= width; dy++) {
         const cy = y + dy;
         if (cy >= 0 && cy < MAP_HEIGHT && tiles[cy][x].terrain !== TerrainType.WATER) {
@@ -56,7 +61,6 @@ function generateRiver(
           };
         }
       }
-      // Random walk for river direction
       const drift = Math.random();
       if (drift < 0.3 && y > 2) {
         y -= 1;
@@ -66,7 +70,6 @@ function generateRiver(
       x++;
     }
   } else {
-    // River flows top to bottom
     for (let step = 0; step < MAP_HEIGHT; step++) {
       const width = randomInt(2, 3);
       for (let dx = 0; dx < width; dx++) {
@@ -79,7 +82,6 @@ function generateRiver(
           };
         }
       }
-      // Add dirt banks
       for (let dx = -1; dx <= width; dx++) {
         const cx = x + dx;
         if (cx >= 0 && cx < MAP_WIDTH && tiles[y][cx].terrain !== TerrainType.WATER) {
@@ -90,7 +92,6 @@ function generateRiver(
           };
         }
       }
-      // Random walk
       const drift = Math.random();
       if (drift < 0.3 && x > 2) {
         x -= 1;
@@ -116,7 +117,7 @@ export function generateMap(): GameMap {
     }
   }
 
-  // Place border trees
+  // Place border trees (large for borders)
   for (let x = 0; x < MAP_WIDTH; x++) {
     for (let y = 0; y < MAP_HEIGHT; y++) {
       if (
@@ -128,6 +129,7 @@ export function generateMap(): GameMap {
         if (tiles[y][x].terrain !== TerrainType.WATER) {
           tiles[y][x].obstacle = 'tree';
           tiles[y][x].obstaclePos = { x: x * 48, y: y * 48 };
+          tiles[y][x].treeSize = TreeSize.LARGE;
         }
       }
     }
@@ -144,14 +146,14 @@ export function generateMap(): GameMap {
         tiles[y][x].terrain = TerrainType.GRASS;
         tiles[y][x].obstacle = null;
         tiles[y][x].obstaclePos = null;
+        tiles[y][x].treeSize = undefined;
       }
     }
   }
 
-  // Scatter trees (15% of grass tiles)
+  // Scatter trees (15% of grass tiles) with random sizes
   for (let y = 1; y < MAP_HEIGHT - 1; y++) {
     for (let x = 1; x < MAP_WIDTH - 1; x++) {
-      // Skip center clearing
       if (
         x >= centerX - clearRadius &&
         x <= centerX + clearRadius &&
@@ -165,6 +167,7 @@ export function generateMap(): GameMap {
         if (Math.random() < 0.15) {
           tiles[y][x].obstacle = 'tree';
           tiles[y][x].obstaclePos = { x: x * 48, y: y * 48 };
+          tiles[y][x].treeSize = randomTreeSize();
         }
       }
     }

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { GameEngine } from '@/game/engine';
 import { loadSprites } from '@/game/sprites';
+import { TimeOfDay } from '@/game/types';
 
 type GameState = 'title' | 'loading' | 'playing';
 
@@ -10,6 +11,7 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
   const [gameState, setGameState] = useState<GameState>('title');
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TimeOfDay.DAY);
 
   const startGame = useCallback(async () => {
     setGameState('loading');
@@ -20,6 +22,7 @@ export default function Home() {
       if (canvasRef.current) {
         const engine = new GameEngine(canvasRef.current, sprites);
         engineRef.current = engine;
+        engine.onTimeChange = (time) => setTimeOfDay(time);
         engine.init();
         engine.start();
         setGameState('playing');
@@ -27,6 +30,12 @@ export default function Home() {
     } catch (err) {
       console.error('Failed to start game:', err);
       setGameState('title');
+    }
+  }, []);
+
+  const toggleTime = useCallback(() => {
+    if (engineRef.current) {
+      engineRef.current.toggleTimeOfDay();
     }
   }, []);
 
@@ -57,6 +66,47 @@ export default function Home() {
           height: '100vh',
         }}
       />
+
+      {/* Night/Day Toggle Button */}
+      {gameState === 'playing' && (
+        <button
+          onClick={toggleTime}
+          style={{
+            position: 'absolute',
+            bottom: '60px',
+            right: '20px',
+            padding: '10px 20px',
+            fontSize: '14px',
+            fontFamily: 'monospace',
+            fontWeight: 'bold',
+            letterSpacing: '0.1em',
+            color: '#ffffff',
+            background: timeOfDay === TimeOfDay.DAY
+              ? 'rgba(30, 30, 80, 0.7)'
+              : 'rgba(80, 60, 20, 0.7)',
+            border: timeOfDay === TimeOfDay.DAY
+              ? '2px solid #6688cc'
+              : '2px solid #d4a44a',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            textTransform: 'uppercase',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+            transition: 'all 0.3s ease',
+            zIndex: 100,
+            userSelect: 'none',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.5)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+          }}
+        >
+          {timeOfDay === TimeOfDay.DAY ? '🌙 Night Mode' : '☀ Day Mode'}
+        </button>
+      )}
 
       {gameState === 'title' && (
         <div
@@ -227,6 +277,7 @@ export default function Home() {
                 { key: 'Arrow Keys', action: 'Move' },
                 { key: 'Space', action: 'Attack' },
                 { key: 'P', action: 'Pause' },
+                { key: 'N', action: 'Night/Day' },
               ].map((ctrl) => (
                 <div
                   key={ctrl.key}

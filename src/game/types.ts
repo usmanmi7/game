@@ -27,6 +27,17 @@ export enum AnimalState {
   IDLE = 'idle',
 }
 
+export enum TreeSize {
+  SMALL = 'small',
+  MEDIUM = 'medium',
+  LARGE = 'large',
+}
+
+export enum TimeOfDay {
+  DAY = 'day',
+  NIGHT = 'night',
+}
+
 export interface Position {
   x: number;
   y: number;
@@ -75,6 +86,7 @@ export interface MapTile {
   terrain: TerrainType;
   obstacle: 'tree' | 'rock' | 'bush' | null;
   obstaclePos: Position | null;
+  treeSize?: TreeSize;
 }
 
 export interface GameMap {

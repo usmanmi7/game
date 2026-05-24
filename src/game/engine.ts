@@ -8,6 +8,8 @@ import {
   Particle,
   DamageNumber,
   TerrainType,
+  TreeSize,
+  TimeOfDay,
 } from './types';
 import { generateMap, isTileWalkable } from './map';
 import { createHunter, createAnimal, spawnAnimals, findWalkablePosition } from './entities';
@@ -34,6 +36,11 @@ export class GameEngine {
   lastTime: number;
   animationFrameId: number;
   gameTime: number;
+  timeOfDay: TimeOfDay;
+  nightAlpha: number;
+  targetNightAlpha: number;
+  windTime: number;
+  onTimeChange?: (time: TimeOfDay) => void;
   private keyDownHandler: (e: KeyboardEvent) => void;
   private keyUpHandler: (e: KeyboardEvent) => void;
   private resizeHandler: () => void;
@@ -52,6 +59,10 @@ export class GameEngine {
     this.lastTime = 0;
     this.animationFrameId = 0;
     this.gameTime = 0;
+    this.timeOfDay = TimeOfDay.DAY;
+    this.nightAlpha = 0;
+    this.targetNightAlpha = 0;
+    this.windTime = 0;
 
     // Generate map
     this.map = generateMap();
@@ -89,6 +100,9 @@ export class GameEngine {
         if (this.isGameOver) {
           this.restart();
         }
+      }
+      if (e.key === 'n' || e.key === 'N') {
+        this.toggleTimeOfDay();
       }
     };
 
@@ -138,6 +152,19 @@ export class GameEngine {
     this.updateCamera();
   }
 
+  toggleTimeOfDay(): void {
+    if (this.timeOfDay === TimeOfDay.DAY) {
+      this.timeOfDay = TimeOfDay.NIGHT;
+      this.targetNightAlpha = 0.55;
+    } else {
+      this.timeOfDay = TimeOfDay.DAY;
+      this.targetNightAlpha = 0;
+    }
+    if (this.onTimeChange) {
+      this.onTimeChange(this.timeOfDay);
+    }
+  }
+
   gameLoop(timestamp: number): void {
     if (!this.isRunning) return;
 
@@ -154,6 +181,7 @@ export class GameEngine {
 
   update(deltaTime: number): void {
     this.gameTime += deltaTime;
+    this.windTime += deltaTime;
     this.updateHunter(deltaTime);
     this.updateAnimals(deltaTime);
     this.updateCamera();
@@ -162,6 +190,14 @@ export class GameEngine {
     this.checkHunterAttack();
     this.handleAnimalAttacks(deltaTime);
     this.checkAnimalRespawn(deltaTime);
+
+    // Smooth night/day transition
+    const transitionSpeed = 2;
+    if (this.nightAlpha < this.targetNightAlpha) {
+      this.nightAlpha = Math.min(this.targetNightAlpha, this.nightAlpha + transitionSpeed * deltaTime);
+    } else if (this.nightAlpha > this.targetNightAlpha) {
+      this.nightAlpha = Math.max(this.targetNightAlpha, this.nightAlpha - transitionSpeed * deltaTime);
+    }
   }
 
   updateHunter(deltaTime: number): void {
@@ -375,22 +411,26 @@ export class GameEngine {
 
   checkAnimalRespawn(deltaTime: number): void {
     for (const animal of this.animals) {
-      if (animal.isDead && animal.respawnTimer <= 0) {
-        const pos = findWalkablePosition(
-          this.map,
-          this.hunter.pos.x,
-          this.hunter.pos.y,
-          400
-        );
-        if (pos) {
-          const newAnimal = createAnimal(
-            animal.type,
-            pos.x,
-            pos.y
-          );
-          Object.assign(animal, newAnimal);
+      if (animal.isDead) {
+        if (animal.respawnTimer > 0) {
+          animal.respawnTimer -= deltaTime;
         } else {
-          animal.respawnTimer = 5;
+          const pos = findWalkablePosition(
+            this.map,
+            this.hunter.pos.x,
+            this.hunter.pos.y,
+            400
+          );
+          if (pos) {
+            const newAnimal = createAnimal(
+              animal.type,
+              pos.x,
+              pos.y
+            );
+            Object.assign(animal, newAnimal);
+          } else {
+            animal.respawnTimer = 5;
+          }
         }
       }
     }
@@ -413,12 +453,43 @@ export class GameEngine {
     }
   }
 
+  // Get tree sprite key based on size
+  getTreeSpriteKey(treeSize?: TreeSize): string {
+    switch (treeSize) {
+      case TreeSize.SMALL: return 'tree_small';
+      case TreeSize.MEDIUM: return 'tree_medium';
+      case TreeSize.LARGE: return 'tree_large';
+      default: return 'tree_medium';
+    }
+  }
+
+  // Get tree render dimensions based on size
+  getTreeDimensions(treeSize?: TreeSize): { width: number; height: number; offsetX: number; offsetY: number } {
+    switch (treeSize) {
+      case TreeSize.SMALL:
+        return { width: 56, height: 72, offsetX: -4, offsetY: -24 };
+      case TreeSize.LARGE:
+        return { width: 96, height: 112, offsetX: -24, offsetY: -64 };
+      case TreeSize.MEDIUM:
+      default:
+        return { width: 72, height: 88, offsetX: -12, offsetY: -40 };
+    }
+  }
+
+  // Calculate wind sway offset for trees
+  getWindSway(x: number, _y: number, treeSize?: TreeSize): number {
+    const intensity = treeSize === TreeSize.LARGE ? 4 : treeSize === TreeSize.MEDIUM ? 3 : 2;
+    const frequency = 1.5;
+    const phase = x * 0.01;
+    return Math.sin(this.windTime * frequency + phase) * intensity;
+  }
+
   render(): void {
     const ctx = this.ctx;
     ctx.imageSmoothingEnabled = false;
 
     // Clear
-    ctx.fillStyle = '#1a1a2e';
+    ctx.fillStyle = this.timeOfDay === TimeOfDay.NIGHT ? '#0a0a1a' : '#1a1a2e';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     ctx.save();
@@ -433,9 +504,19 @@ export class GameEngine {
 
     ctx.restore();
 
+    // Night overlay
+    if (this.nightAlpha > 0.01) {
+      ctx.fillStyle = `rgba(5, 5, 30, ${this.nightAlpha})`;
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      // Render torch/light glow around hunter
+      this.renderNightLight();
+    }
+
     // HUD renders in screen space
     this.renderHUD();
     this.renderMinimap();
+    this.renderTimeToggleButton();
 
     if (this.isPaused) {
       this.renderPauseScreen();
@@ -443,6 +524,47 @@ export class GameEngine {
     if (this.isGameOver) {
       this.renderGameOver();
     }
+  }
+
+  renderNightLight(): void {
+    const ctx = this.ctx;
+    const hx = this.hunter.pos.x - this.camera.x;
+    const hy = this.hunter.pos.y - this.camera.y;
+    const lightRadius = 180;
+
+    // Create radial gradient for torch light
+    const gradient = ctx.createRadialGradient(hx, hy, 0, hx, hy, lightRadius);
+    gradient.addColorStop(0, `rgba(255, 200, 100, ${0.3 * this.nightAlpha})`);
+    gradient.addColorStop(0.3, `rgba(255, 180, 80, ${0.15 * this.nightAlpha})`);
+    gradient.addColorStop(0.7, `rgba(255, 150, 50, ${0.05 * this.nightAlpha})`);
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = gradient;
+    ctx.fillRect(hx - lightRadius, hy - lightRadius, lightRadius * 2, lightRadius * 2);
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Stars in night mode
+    if (this.nightAlpha > 0.3) {
+      this.renderStars();
+    }
+  }
+
+  renderStars(): void {
+    const ctx = this.ctx;
+    const starAlpha = (this.nightAlpha - 0.3) / 0.25;
+    ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(0.8, starAlpha)})`;
+
+    // Use deterministic positions based on index
+    for (let i = 0; i < 60; i++) {
+      const sx = ((i * 137.508) % this.canvas.width);
+      const sy = ((i * 97.331) % (this.canvas.height * 0.4));
+      const twinkle = Math.sin(this.gameTime * 2 + i * 0.5) * 0.3 + 0.7;
+      const size = i % 3 === 0 ? 2 : 1;
+      ctx.globalAlpha = twinkle * Math.min(0.8, starAlpha);
+      ctx.fillRect(sx, sy, size, size);
+    }
+    ctx.globalAlpha = 1;
   }
 
   renderTerrain(): void {
@@ -490,7 +612,6 @@ export class GameEngine {
           // Fallback colors
           switch (tile.terrain) {
             case TerrainType.GRASS:
-              // Slight color variation
               const shade = ((x * 7 + y * 13) % 3) * 5;
               ctx.fillStyle = `rgb(${60 + shade}, ${120 + shade}, ${40 + shade})`;
               break;
@@ -531,7 +652,7 @@ export class GameEngine {
         if (tile.obstacle === 'bush') {
           const sprite = this.sprites['bush'];
           if (sprite) {
-            ctx.drawImage(sprite, px, py, TILE_SIZE, TILE_SIZE);
+            ctx.drawImage(sprite, px - 6, py - 6, TILE_SIZE + 12, TILE_SIZE + 12);
           } else {
             ctx.fillStyle = '#2d6a2d';
             ctx.fillRect(px + 4, py + 4, TILE_SIZE - 8, TILE_SIZE - 8);
@@ -539,7 +660,7 @@ export class GameEngine {
         } else if (tile.obstacle === 'rock') {
           const sprite = this.sprites['rock'];
           if (sprite) {
-            ctx.drawImage(sprite, px, py, TILE_SIZE, TILE_SIZE);
+            ctx.drawImage(sprite, px - 10, py - 10, TILE_SIZE + 20, TILE_SIZE + 20);
           } else {
             ctx.fillStyle = '#777777';
             ctx.fillRect(px + 6, py + 6, TILE_SIZE - 12, TILE_SIZE - 12);
@@ -552,15 +673,15 @@ export class GameEngine {
 
   renderTrees(): void {
     const ctx = this.ctx;
-    const startCol = Math.max(0, Math.floor(this.camera.x / TILE_SIZE) - 1);
+    const startCol = Math.max(0, Math.floor(this.camera.x / TILE_SIZE) - 2);
     const endCol = Math.min(
       this.map.width,
-      Math.ceil((this.camera.x + this.camera.width) / TILE_SIZE) + 2
+      Math.ceil((this.camera.x + this.camera.width) / TILE_SIZE) + 3
     );
-    const startRow = Math.max(0, Math.floor(this.camera.y / TILE_SIZE) - 1);
+    const startRow = Math.max(0, Math.floor(this.camera.y / TILE_SIZE) - 2);
     const endRow = Math.min(
       this.map.height,
-      Math.ceil((this.camera.y + this.camera.height) / TILE_SIZE) + 2
+      Math.ceil((this.camera.y + this.camera.height) / TILE_SIZE) + 3
     );
 
     for (let y = startRow; y < endRow; y++) {
@@ -571,18 +692,34 @@ export class GameEngine {
         const px = x * TILE_SIZE;
         const py = y * TILE_SIZE;
 
-        const sprite = this.sprites['tree'];
+        const spriteKey = this.getTreeSpriteKey(tile.treeSize);
+        const dims = this.getTreeDimensions(tile.treeSize);
+        const sprite = this.sprites[spriteKey];
+
+        // Calculate wind sway
+        const sway = this.getWindSway(x, y, tile.treeSize);
+
         if (sprite) {
-          ctx.drawImage(sprite, px - 6, py - 16, TILE_SIZE + 12, TILE_SIZE + 20);
+          ctx.save();
+          // Apply wind sway by translating from the base
+          ctx.translate(px + TILE_SIZE / 2, py + TILE_SIZE);
+          ctx.translate(sway, 0);
+          ctx.translate(-(px + TILE_SIZE / 2), -(py + TILE_SIZE));
+          ctx.drawImage(sprite, px + dims.offsetX, py + dims.offsetY, dims.width, dims.height);
+          ctx.restore();
         } else {
-          // Trunk
+          // Fallback tree drawing
+          ctx.save();
+          ctx.translate(px + TILE_SIZE / 2, py + TILE_SIZE);
+          ctx.translate(sway, 0);
+          ctx.translate(-(px + TILE_SIZE / 2), -(py + TILE_SIZE));
           ctx.fillStyle = '#5a3a1a';
           ctx.fillRect(px + 16, py + 16, 16, 32);
-          // Canopy
           ctx.fillStyle = '#1a5a1a';
           ctx.beginPath();
           ctx.arc(px + 24, py + 12, 22, 0, Math.PI * 2);
           ctx.fill();
+          ctx.restore();
         }
       }
     }
@@ -625,8 +762,11 @@ export class GameEngine {
     const isFlashing = h.invincibleTimer > 0 && Math.floor(h.invincibleTimer * 10) % 2 === 0;
 
     const sprite = this.sprites['hunter'];
-    const x = h.pos.x - h.width / 2;
-    const y = h.pos.y - h.height / 2;
+    // 20px larger than before (was 36, now 56)
+    const renderWidth = 56;
+    const renderHeight = 56;
+    const x = h.pos.x - renderWidth / 2;
+    const y = h.pos.y - renderHeight / 2;
 
     if (isFlashing) {
       ctx.save();
@@ -634,13 +774,12 @@ export class GameEngine {
     }
 
     if (sprite) {
-      drawSprite(ctx, sprite, x, y, h.width, h.height, h.direction);
+      drawSprite(ctx, sprite, x, y, renderWidth, renderHeight, h.direction);
     } else {
-      // Fallback
       ctx.fillStyle = isFlashing ? '#ff4444' : '#8B4513';
-      ctx.fillRect(x, y, h.width, h.height);
+      ctx.fillRect(x, y, renderWidth, renderHeight);
       ctx.fillStyle = '#DEB887';
-      ctx.fillRect(x + 6, y + 2, h.width - 12, h.height / 2);
+      ctx.fillRect(x + 8, y + 2, renderWidth - 16, renderHeight / 2);
     }
 
     if (isFlashing) {
@@ -694,16 +833,25 @@ export class GameEngine {
 
   renderAnimal(animal: Animal): void {
     const ctx = this.ctx;
-    const x = animal.pos.x - animal.width / 2;
-    const y = animal.pos.y - animal.height / 2;
+
+    // Larger sprite sizes (20px more)
+    const sizeMap: Record<string, number> = {
+      rabbit: 44,
+      deer: 52,
+      boar: 54,
+      wolf: 50,
+      bear: 60,
+    };
+    const renderSize = sizeMap[animal.type] || 48;
+    const x = animal.pos.x - renderSize / 2;
+    const y = animal.pos.y - renderSize / 2;
 
     const spriteKey = animal.type;
     const sprite = this.sprites[spriteKey];
 
     if (sprite) {
-      drawSprite(ctx, sprite, x, y, animal.width, animal.height, animal.direction);
+      drawSprite(ctx, sprite, x, y, renderSize, renderSize, animal.direction);
     } else {
-      // Fallback colors
       const colors: Record<string, string> = {
         rabbit: '#c0c0c0',
         deer: '#b5651d',
@@ -712,15 +860,15 @@ export class GameEngine {
         bear: '#4a3520',
       };
       ctx.fillStyle = colors[animal.type] || '#ff00ff';
-      ctx.fillRect(x, y, animal.width, animal.height);
+      ctx.fillRect(x, y, renderSize, renderSize);
     }
 
     // Health bar (only for damaged animals)
     if (animal.health < animal.maxHealth && animal.health > 0) {
-      const barWidth = animal.width + 8;
+      const barWidth = renderSize + 8;
       const barHeight = 4;
       const barX = animal.pos.x - barWidth / 2;
-      const barY = animal.pos.y - animal.height / 2 - 10;
+      const barY = animal.pos.y - renderSize / 2 - 10;
       const healthPct = animal.health / animal.maxHealth;
 
       ctx.fillStyle = '#333333';
@@ -776,7 +924,8 @@ export class GameEngine {
     ctx.fillStyle = '#331111';
     ctx.fillRect(hbX, hbY, hbW, hbH);
 
-    ctx.fillStyle = healthPct > 0.5 ? '#cc2222' : healthPct > 0.25 ? '#cc8822' : '#cc2222';
+    const healthColor = healthPct > 0.5 ? '#cc2222' : healthPct > 0.25 ? '#cc8822' : '#cc2222';
+    ctx.fillStyle = healthColor;
     ctx.fillRect(hbX, hbY, hbW * healthPct, hbH);
 
     ctx.strokeStyle = '#551111';
@@ -802,16 +951,58 @@ export class GameEngine {
     ctx.font = 'bold 14px monospace';
     ctx.fillText(`Captured: ${this.hunter.capturedAnimals}`, 20, 88);
 
+    // Time of day indicator
+    const timeIcon = this.timeOfDay === TimeOfDay.DAY ? '☀' : '🌙';
+    ctx.font = '18px sans-serif';
+    ctx.fillText(timeIcon, 20, 112);
+
     // Controls hint
     ctx.textAlign = 'center';
     ctx.font = '12px monospace';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.fillText(
-      'Arrow Keys: Move | Space: Attack | P: Pause',
+      'Arrow Keys: Move | Space: Attack | P: Pause | N: Night/Day',
       this.canvas.width / 2,
       this.canvas.height - 15
     );
 
+    ctx.textAlign = 'left';
+  }
+
+  renderTimeToggleButton(): void {
+    const ctx = this.ctx;
+    const btnW = 100;
+    const btnH = 36;
+    const btnX = this.canvas.width - btnW - 20;
+    const btnY = this.canvas.height - btnH - 50;
+
+    // Button background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.strokeStyle = this.timeOfDay === TimeOfDay.DAY ? '#d4a44a' : '#6688cc';
+    ctx.lineWidth = 2;
+
+    // Rounded rect
+    const r = 8;
+    ctx.beginPath();
+    ctx.moveTo(btnX + r, btnY);
+    ctx.lineTo(btnX + btnW - r, btnY);
+    ctx.quadraticCurveTo(btnX + btnW, btnY, btnX + btnW, btnY + r);
+    ctx.lineTo(btnX + btnW, btnY + btnH - r);
+    ctx.quadraticCurveTo(btnX + btnW, btnY + btnH, btnX + btnW - r, btnY + btnH);
+    ctx.lineTo(btnX + r, btnY + btnH);
+    ctx.quadraticCurveTo(btnX, btnY + btnH, btnX, btnY + btnH - r);
+    ctx.lineTo(btnX, btnY + r);
+    ctx.quadraticCurveTo(btnX, btnY, btnX + r, btnY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Button text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 13px monospace';
+    ctx.textAlign = 'center';
+    const label = this.timeOfDay === TimeOfDay.DAY ? '🌙 Night' : '☀ Day';
+    ctx.fillText(label, btnX + btnW / 2, btnY + btnH / 2 + 5);
     ctx.textAlign = 'left';
   }
 
@@ -830,20 +1021,33 @@ export class GameEngine {
     const scaleX = mmW / this.map.width;
     const scaleY = mmH / this.map.height;
 
-    // Draw in low resolution
     for (let y = 0; y < this.map.height; y += 2) {
       for (let x = 0; x < this.map.width; x += 2) {
         const tile = this.map.tiles[y][x];
-        switch (tile.terrain) {
-          case TerrainType.GRASS:
-            ctx.fillStyle = '#2a5a2a';
-            break;
-          case TerrainType.WATER:
-            ctx.fillStyle = '#2255aa';
-            break;
-          case TerrainType.DIRT:
-            ctx.fillStyle = '#6b5535';
-            break;
+        if (this.timeOfDay === TimeOfDay.NIGHT) {
+          switch (tile.terrain) {
+            case TerrainType.GRASS:
+              ctx.fillStyle = '#152015';
+              break;
+            case TerrainType.WATER:
+              ctx.fillStyle = '#112244';
+              break;
+            case TerrainType.DIRT:
+              ctx.fillStyle = '#3a2a1a';
+              break;
+          }
+        } else {
+          switch (tile.terrain) {
+            case TerrainType.GRASS:
+              ctx.fillStyle = '#2a5a2a';
+              break;
+            case TerrainType.WATER:
+              ctx.fillStyle = '#2255aa';
+              break;
+            case TerrainType.DIRT:
+              ctx.fillStyle = '#6b5535';
+              break;
+          }
         }
         ctx.fillRect(mmX + x * scaleX, mmY + y * scaleY, scaleX * 2 + 1, scaleY * 2 + 1);
       }
