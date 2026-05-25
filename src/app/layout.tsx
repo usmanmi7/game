@@ -1,32 +1,36 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Wild Forest Hunter - 2D Browser Game",
-  description: "A wild hunter living in a forest captures animals. Survive the wild, hunt animals, and earn your glory in this 2D browser game!",
-  keywords: ["game", "2D", "forest", "hunter", "browser game", "animals", "survival"],
-  authors: [{ name: "Wild Forest Hunter" }],
+  title: "Usman Milas — Freelance Designer & Developer",
+  description:
+    "Helping brands stand out in the digital era. Freelance web designer & developer from Sri Lanka with over 4 years of experience in modern, responsive, and user-focused website design.",
+  keywords: [
+    "web designer",
+    "freelance developer",
+    "Sri Lanka",
+    "Webflow",
+    "WordPress",
+    "UI/UX",
+    "portfolio",
+  ],
+  authors: [{ name: "Usman Milas" }],
   openGraph: {
-    title: "Wild Forest Hunter",
-    description: "Hunt animals. Survive the wild. Earn your glory.",
+    title: "Usman Milas — Freelance Designer & Developer",
+    description:
+      "Helping brands stand out in the digital era. Modern, responsive, and user-focused website design.",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Wild Forest Hunter",
-    description: "Hunt animals. Survive the wild. Earn your glory.",
   },
 };
 
@@ -36,12 +40,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} ${spaceGrotesk.variable} antialiased bg-[#0a0a0a] text-white overflow-x-hidden`}
       >
         {children}
-        <Toaster />
       </body>
     </html>
   );
