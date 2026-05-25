@@ -23,10 +23,11 @@ function randomInt(min: number, max: number): number {
 }
 
 function randomTreeSize(): TreeSize {
+  // Big and small tree combination - mostly large and small, some medium
   const roll = Math.random();
-  if (roll < 0.35) return TreeSize.SMALL;
-  if (roll < 0.7) return TreeSize.MEDIUM;
-  return TreeSize.LARGE;
+  if (roll < 0.4) return TreeSize.LARGE;    // 40% large trees (dominant big trees)
+  if (roll < 0.65) return TreeSize.SMALL;   // 25% small trees (understory)
+  return TreeSize.MEDIUM;                    // 35% medium trees
 }
 
 function generateRiver(
@@ -151,7 +152,7 @@ export function generateMap(): GameMap {
     }
   }
 
-  // Scatter trees (15% of grass tiles) with random sizes
+  // Scatter trees (18% of grass tiles) with big and small combination
   for (let y = 1; y < MAP_HEIGHT - 1; y++) {
     for (let x = 1; x < MAP_WIDTH - 1; x++) {
       if (
@@ -164,10 +165,48 @@ export function generateMap(): GameMap {
       }
 
       if (tiles[y][x].terrain === TerrainType.GRASS && !tiles[y][x].obstacle) {
-        if (Math.random() < 0.15) {
+        if (Math.random() < 0.18) {
           tiles[y][x].obstacle = 'tree';
           tiles[y][x].obstaclePos = { x: x * 48, y: y * 48 };
           tiles[y][x].treeSize = randomTreeSize();
+        }
+      }
+    }
+  }
+
+  // Add tree clusters - groups of large and small trees together for natural look
+  const clusterCount = randomInt(8, 14);
+  for (let c = 0; c < clusterCount; c++) {
+    const cx = randomInt(3, MAP_WIDTH - 4);
+    const cy = randomInt(3, MAP_HEIGHT - 4);
+    const clusterRadius = randomInt(2, 4);
+    const isBigCluster = Math.random() < 0.6; // 60% chance of large tree cluster
+
+    for (let dy = -clusterRadius; dy <= clusterRadius; dy++) {
+      for (let dx = -clusterRadius; dx <= clusterRadius; dx++) {
+        const tx = cx + dx;
+        const ty = cy + dy;
+        if (tx <= 0 || tx >= MAP_WIDTH - 1 || ty <= 0 || ty >= MAP_HEIGHT - 1) continue;
+        if (
+          tx >= centerX - clearRadius &&
+          tx <= centerX + clearRadius &&
+          ty >= centerY - clearRadius &&
+          ty <= centerY + clearRadius
+        ) continue;
+
+        const tile = tiles[ty][tx];
+        if (tile.terrain === TerrainType.GRASS && !tile.obstacle) {
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist <= clusterRadius && Math.random() < 0.7) {
+            tile.obstacle = 'tree';
+            tile.obstaclePos = { x: tx * 48, y: ty * 48 };
+            // Big clusters have large trees, small clusters have small trees
+            if (isBigCluster) {
+              tile.treeSize = Math.random() < 0.7 ? TreeSize.LARGE : TreeSize.MEDIUM;
+            } else {
+              tile.treeSize = Math.random() < 0.6 ? TreeSize.SMALL : TreeSize.MEDIUM;
+            }
+          }
         }
       }
     }

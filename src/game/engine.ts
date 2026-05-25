@@ -463,23 +463,23 @@ export class GameEngine {
     }
   }
 
-  // Get tree render dimensions based on size
+  // Get tree render dimensions based on size (2x bigger)
   getTreeDimensions(treeSize?: TreeSize): { width: number; height: number; offsetX: number; offsetY: number } {
     switch (treeSize) {
       case TreeSize.SMALL:
-        return { width: 56, height: 72, offsetX: -4, offsetY: -24 };
+        return { width: 112, height: 144, offsetX: -32, offsetY: -96 };
       case TreeSize.LARGE:
-        return { width: 96, height: 112, offsetX: -24, offsetY: -64 };
+        return { width: 192, height: 224, offsetX: -72, offsetY: -176 };
       case TreeSize.MEDIUM:
       default:
-        return { width: 72, height: 88, offsetX: -12, offsetY: -40 };
+        return { width: 152, height: 184, offsetX: -52, offsetY: -136 };
     }
   }
 
-  // Calculate wind sway offset for trees
+  // Calculate wind sway offset for trees (2x bigger = more sway)
   getWindSway(x: number, _y: number, treeSize?: TreeSize): number {
-    const intensity = treeSize === TreeSize.LARGE ? 4 : treeSize === TreeSize.MEDIUM ? 3 : 2;
-    const frequency = 1.5;
+    const intensity = treeSize === TreeSize.LARGE ? 8 : treeSize === TreeSize.MEDIUM ? 6 : 4;
+    const frequency = 1.2;
     const phase = x * 0.01;
     return Math.sin(this.windTime * frequency + phase) * intensity;
   }
@@ -673,15 +673,16 @@ export class GameEngine {
 
   renderTrees(): void {
     const ctx = this.ctx;
-    const startCol = Math.max(0, Math.floor(this.camera.x / TILE_SIZE) - 2);
+    // Extended range for bigger trees that extend well beyond their tile
+    const startCol = Math.max(0, Math.floor(this.camera.x / TILE_SIZE) - 4);
     const endCol = Math.min(
       this.map.width,
-      Math.ceil((this.camera.x + this.camera.width) / TILE_SIZE) + 3
+      Math.ceil((this.camera.x + this.camera.width) / TILE_SIZE) + 5
     );
-    const startRow = Math.max(0, Math.floor(this.camera.y / TILE_SIZE) - 2);
+    const startRow = Math.max(0, Math.floor(this.camera.y / TILE_SIZE) - 4);
     const endRow = Math.min(
       this.map.height,
-      Math.ceil((this.camera.y + this.camera.height) / TILE_SIZE) + 3
+      Math.ceil((this.camera.y + this.camera.height) / TILE_SIZE) + 5
     );
 
     for (let y = startRow; y < endRow; y++) {
@@ -708,16 +709,20 @@ export class GameEngine {
           ctx.drawImage(sprite, px + dims.offsetX, py + dims.offsetY, dims.width, dims.height);
           ctx.restore();
         } else {
-          // Fallback tree drawing
+          // Fallback tree drawing (scaled for 2x bigger trees)
+          const fallbackDims = this.getTreeDimensions(tile.treeSize);
           ctx.save();
           ctx.translate(px + TILE_SIZE / 2, py + TILE_SIZE);
           ctx.translate(sway, 0);
           ctx.translate(-(px + TILE_SIZE / 2), -(py + TILE_SIZE));
           ctx.fillStyle = '#5a3a1a';
-          ctx.fillRect(px + 16, py + 16, 16, 32);
+          const tw = fallbackDims.width * 0.15;
+          const th = fallbackDims.height * 0.4;
+          ctx.fillRect(px + TILE_SIZE/2 - tw/2, py + TILE_SIZE - th - 10, tw, th);
           ctx.fillStyle = '#1a5a1a';
           ctx.beginPath();
-          ctx.arc(px + 24, py + 12, 22, 0, Math.PI * 2);
+          const cr = fallbackDims.width * 0.35;
+          ctx.arc(px + TILE_SIZE/2, py + TILE_SIZE - th - 10 - cr * 0.3, cr, 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
         }
