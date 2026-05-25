@@ -1,214 +1,301 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 
-/* ─── Data ─── */
-const GREETINGS = ["Hello", "Hola", "Bonjour", "Ciao", "வணக்கம்"];
+/* ═══════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════ */
 
-const WORKS = [
+const PROJECTS = [
   {
     title: "N&Rans",
+    tag: "E-Commerce",
     year: "2022",
-    category: "Interaction & Development",
-    image: "/work-1.jpg",
+    image: "/project-1.jpg",
+    desc: "Premium fashion e-commerce with immersive product storytelling and seamless purchasing flow.",
+    tools: ["Webflow", "Custom JS"],
   },
   {
     title: "LangChain",
-    year: "2022",
-    category: "Interaction & Development",
-    image: "/work-2.jpg",
+    tag: "Web App",
+    year: "2023",
+    image: "/project-2.jpg",
+    desc: "AI-powered platform with dynamic data visualization and real-time collaboration interfaces.",
+    tools: ["Next.js", "Tailwind"],
   },
   {
     title: "SalzCorp",
+    tag: "Corporate",
     year: "2023",
-    category: "Interaction & Development",
-    image: "/work-3.jpg",
+    image: "/project-3.jpg",
+    desc: "Corporate brand identity with cutting-edge animations and responsive design system.",
+    tools: ["WordPress", "GSAP"],
   },
   {
-    title: "Airnet&co",
+    title: "Airnet&Co",
+    tag: "Agency",
     year: "2025",
-    category: "Interaction & Development",
-    image: "/work-4.jpg",
+    image: "/project-4.jpg",
+    desc: "Digital agency portfolio featuring creative transitions, 3D elements, and interactive storytelling.",
+    tools: ["Webflow", "Three.js"],
   },
 ];
 
-const PORTFOLIO_IMAGES = [
-  "/work-1.jpg",
-  "/work-2.jpg",
-  "/work-3.jpg",
-  "/work-4.jpg",
-  "/work-1.jpg",
-  "/work-2.jpg",
-  "/work-3.jpg",
-  "/work-4.jpg",
+const SERVICES = [
+  {
+    number: "01",
+    title: "Website Design",
+    desc: "Pixel-perfect, custom websites that captivate visitors and convert them into loyal customers. Every layout, animation, and interaction is crafted with intention.",
+    tags: ["UI/UX", "Responsive", "Figma"],
+  },
+  {
+    number: "02",
+    title: "Web Development",
+    desc: "Clean, performant code that brings designs to life. From Webflow to custom solutions — fast, accessible, and built to scale with your business.",
+    tags: ["Webflow", "WordPress", "Next.js"],
+  },
+  {
+    number: "03",
+    title: "Brand Identity",
+    desc: "Cohesive visual systems that make brands unforgettable. Logos, color palettes, typography, and guidelines that tell your story at every touchpoint.",
+    tags: ["Logo", "Guidelines", "Strategy"],
+  },
+  {
+    number: "04",
+    title: "Digital Campaigns",
+    desc: "Data-driven marketing strategies combined with creative storytelling. SEO, content, and social campaigns that grow your audience organically.",
+    tags: ["SEO", "Content", "Social"],
+  },
 ];
 
-const SOCIALS = [
+const TECH_STACK = [
+  "Webflow", "WordPress", "Wix", "Next.js", "React",
+  "Tailwind CSS", "Figma", "GSAP", "Three.js", "Shopify",
+];
+
+const SOCIAL_LINKS = [
   { label: "WhatsApp", href: "http://wa.me/+779194083" },
   { label: "Facebook", href: "https://web.facebook.com/mhd.usman.mi/" },
-  { label: "Twitter", href: "https://x.com/" },
+  { label: "X", href: "https://x.com/" },
+  { label: "Fiverr", href: "https://www.fiverr.com/webworks_456/" },
 ];
 
-/* ─── Loading Screen ─── */
-function LoadingScreen({ onComplete }: { onComplete: () => void }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [fadeOut, setFadeOut] = useState(false);
+/* ═══════════════════════════════════════════
+   LOADING SCREEN
+   ═══════════════════════════════════════════ */
+
+function Loader({ onComplete }: { onComplete: () => void }) {
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => {
-        if (prev >= GREETINGS.length - 1) {
+      setProgress((p) => {
+        if (p >= 100) {
           clearInterval(interval);
-          setTimeout(() => setFadeOut(true), 400);
-          setTimeout(() => onComplete(), 900);
-          return prev;
+          setTimeout(onComplete, 400);
+          return 100;
         }
-        return prev + 1;
+        return p + 4;
       });
-    }, 450);
+    }, 40);
     return () => clearInterval(interval);
   }, [onComplete]);
 
   return (
-    <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#f5f5f5] transition-opacity duration-500 ${
-        fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
-      }`}
-    >
-      <div className="text-center">
-        <div className="h-20 flex items-center justify-center overflow-hidden relative">
-          {GREETINGS.map((g, i) => (
-            <span
-              key={g}
-              className={`absolute text-5xl md:text-7xl font-display font-medium transition-all duration-400 ${
-                i === currentIndex
-                  ? "opacity-100 translate-y-0"
-                  : i < currentIndex
-                  ? "opacity-0 -translate-y-12"
-                  : "opacity-0 translate-y-12"
-              }`}
-            >
-              {g}
-            </span>
-          ))}
+    <div className="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center">
+      <div className="text-center mb-12">
+        <div className="text-6xl md:text-8xl font-display font-800 gradient-text mb-4">
+          UM
         </div>
+        <p className="text-xs tracking-[0.3em] text-white/30 uppercase">
+          Loading experience
+        </p>
       </div>
+      <div className="w-48 h-[2px] bg-white/5 rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-200 ease-out"
+          style={{
+            width: `${progress}%`,
+            background: "linear-gradient(90deg, #ff6b35, #c084fc)",
+          }}
+        />
+      </div>
+      <p className="text-xs text-white/20 mt-4 font-mono">{progress}%</p>
     </div>
   );
 }
 
-/* ─── Navigation ─── */
-function Navigation({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (v: boolean) => void }) {
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
+
+function Nav({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (v: boolean) => void }) {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <>
-      {/* Top Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 py-5">
-        {/* Logo */}
-        <a href="#hero" className="text-sm font-medium tracking-wide text-[#666] hover:text-black transition-colors">
-          Usman Milas
-        </a>
-
-        {/* Desktop Nav Links */}
-        <div className="hidden md:flex items-center gap-8">
-          <a href="#hero" className="text-sm font-medium text-[#666] hover:text-black transition-colors">Home</a>
-          <a href="#about" className="text-sm font-medium text-[#666] hover:text-black transition-colors">About</a>
-          <a href="#contact" className="text-sm font-medium text-[#666] hover:text-black transition-colors">Contact</a>
-        </div>
-
-        {/* Hamburger Menu Button */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="relative w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-full bg-[#0a0a0a]"
-          aria-label="Toggle menu"
-        >
-          <span className={`w-4 h-[1.5px] bg-white transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[3.5px]" : ""}`} />
-          <span className={`w-4 h-[1.5px] bg-white transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[3.5px]" : ""}`} />
-        </button>
-      </nav>
-
-      {/* Full-screen Mobile Menu */}
-      <div
-        className={`fixed inset-0 z-40 bg-[#f5f5f5] transition-all duration-500 flex flex-col items-center justify-center ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled ? "bg-[#050505]/80 backdrop-blur-xl border-b border-white/[0.04]" : ""
         }`}
       >
-        <nav className="flex flex-col items-center gap-6">
-          {[
-            { label: "Home", href: "#hero" },
-            { label: "About", href: "#about" },
-            { label: "Works", href: "#works" },
-            { label: "Contact", href: "#contact" },
-          ].map((link, i) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="text-3xl font-display font-medium text-[#0a0a0a] hover:text-[#666] transition-colors"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-        <div className="mt-12 flex flex-col items-center gap-3">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#999]">Socials</span>
-          <div className="flex gap-6">
-            {SOCIALS.map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="text-sm text-[#666] hover:text-black transition-colors">
-                {s.label}
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-10 py-4 md:py-5">
+          {/* Logo */}
+          <a href="#hero" className="relative z-50 flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#ff6b35] to-[#c084fc] flex items-center justify-center">
+              <span className="text-sm font-display font-800 text-white">U</span>
+            </div>
+            <span className="font-display font-700 text-lg tracking-tight hidden sm:block">
+              Usman<span className="text-white/30">.</span>
+            </span>
+          </a>
+
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center gap-8">
+            {["About", "Work", "Services", "Contact"].map((link) => (
+              <a
+                key={link}
+                href={`#${link.toLowerCase()}`}
+                className="text-sm text-white/40 hover:text-white transition-colors duration-300 tracking-wide"
+              >
+                {link}
               </a>
             ))}
           </div>
+
+          {/* CTA + Hamburger */}
+          <div className="flex items-center gap-4">
+            <a
+              href="#contact"
+              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium bg-white text-[#050505] hover:bg-white/90 transition-all"
+            >
+              Let&apos;s Talk
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="relative z-50 w-9 h-9 flex flex-col items-center justify-center gap-[5px] rounded-xl bg-white/5 border border-white/[0.06]"
+              aria-label="Toggle menu"
+            >
+              <span className={`w-4 h-[1.5px] bg-white transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[3.5px]" : ""}`} />
+              <span className={`w-4 h-[1.5px] bg-white transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[3.5px]" : ""}`} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile menu */}
+      <div
+        className={`fixed inset-0 z-40 bg-[#050505] transition-all duration-600 flex flex-col items-center justify-center ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        style={{ transition: "opacity 0.5s ease" }}
+      >
+        <nav className="flex flex-col items-center gap-6">
+          {["About", "Work", "Services", "Contact"].map((link, i) => (
+            <a
+              key={link}
+              href={`#${link.toLowerCase()}`}
+              onClick={() => setMenuOpen(false)}
+              className="text-4xl font-display font-700 gradient-text-subtle hover:gradient-text transition-all"
+              style={{ animationDelay: `${i * 0.08}s` }}
+            >
+              {link}
+            </a>
+          ))}
+        </nav>
+        <div className="mt-16 flex gap-5">
+          {SOCIAL_LINKS.map((s) => (
+            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-white/30 hover:text-[#ff6b35] transition-colors uppercase tracking-widest">
+              {s.label}
+            </a>
+          ))}
         </div>
       </div>
     </>
   );
 }
 
-/* ─── Hero Section ─── */
-function HeroSection() {
+/* ═══════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════ */
+
+function Hero() {
   return (
-    <section id="hero" className="relative min-h-screen bg-[#e8e8e8] flex flex-col">
-      {/* Two-part hero layout */}
-      <div className="flex-1 flex flex-col justify-center px-6 md:px-10 pt-24 pb-0">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between w-full max-w-7xl mx-auto">
-          {/* Left: "Usman" */}
-          <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-display font-medium leading-[0.9] tracking-tight animate-fade-in">
-            Usman
-          </h1>
+    <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0">
+        <Image src="/hero-2026.jpg" alt="" fill className="object-cover opacity-20" priority />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/50 via-[#050505]/70 to-[#050505]" />
+      </div>
 
-          {/* Right: Freelance label + arrow */}
-          <div className="flex flex-col items-end gap-4 mb-2 md:mb-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <div className="flex items-center gap-3">
-              <span className="text-sm md:text-base font-medium text-[#555]">
-                Freelance <br /> Designer & Developer
-              </span>
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="text-[#0a0a0a]">
-                <path d="M10 30L30 10M30 10H18M30 10V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-          </div>
+      {/* Decorative gradient orbs */}
+      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#ff6b35]/[0.04] blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full bg-[#c084fc]/[0.03] blur-[100px] pointer-events-none" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-32 pb-20 w-full">
+        {/* Available badge */}
+        <div className="flex items-center gap-3 mb-8 animate-fade-in-up">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b35] opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff6b35]" />
+          </span>
+          <span className="text-sm text-white/50 tracking-wide">Available for freelance work</span>
+        </div>
+
+        {/* Main heading */}
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[6.5rem] font-display font-800 leading-[0.95] tracking-tight mb-8 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
+          Crafting
+          <br />
+          <span className="gradient-text">digital</span> experiences
+          <br />
+          that <span className="italic font-500 text-white/60">matter</span>
+        </h1>
+
+        {/* Subline */}
+        <p className="text-lg md:text-xl text-white/40 max-w-xl mb-12 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
+          Freelance designer & developer from Sri Lanka — building modern, responsive, and unforgettable websites.
+        </p>
+
+        {/* CTA buttons */}
+        <div className="flex flex-wrap gap-4 animate-fade-in-up" style={{ animationDelay: "0.45s" }}>
+          <a
+            href="#work"
+            className="group inline-flex items-center gap-3 px-7 py-4 rounded-full bg-gradient-to-r from-[#ff6b35] to-[#ff8f5e] text-white text-sm font-medium hover:shadow-[0_0_40px_rgba(255,107,53,0.3)] transition-all duration-500"
+          >
+            View My Work
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:translate-x-1 transition-transform">
+              <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-sm font-medium border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all"
+          >
+            Get In Touch
+          </a>
         </div>
       </div>
 
-      {/* Bottom: "Milas" + Marquee */}
-      <div className="px-6 md:px-10 pb-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-display font-medium leading-[0.9] tracking-tight text-right animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            Milas
-          </h1>
-        </div>
-      </div>
-
-      {/* Scrolling marquee strip */}
-      <div className="border-t border-[#ccc] py-3 overflow-hidden bg-[#e0e0e0]">
+      {/* Bottom marquee */}
+      <div className="absolute bottom-0 left-0 right-0 border-t border-white/[0.04] py-4 overflow-hidden">
         <div className="animate-marquee whitespace-nowrap flex">
-          {[...Array(2)].map((_, setIdx) => (
-            <span key={setIdx} className="flex-shrink-0">
-              {Array(10).fill("Usman Milas").map((name, i) => (
-                <span key={`${setIdx}-${i}`} className="text-2xl md:text-4xl font-display font-medium text-[#0a0a0a]/[0.07] mx-3">
-                  {name} —
+          {[...Array(2)].map((_, si) => (
+            <span key={si} className="flex-shrink-0 flex items-center">
+              {Array(8).fill(0).map((_, i) => (
+                <span key={`${si}-${i}`} className="flex items-center mx-4 md:mx-6">
+                  <span className="text-lg md:text-2xl font-display font-600 text-white/[0.04]">Usman Milas</span>
+                  <span className="text-[#ff6b35]/20 ml-4 md:ml-6 text-xs">◆</span>
                 </span>
               ))}
             </span>
@@ -219,236 +306,375 @@ function HeroSection() {
   );
 }
 
-/* ─── Intro Section ─── */
-function IntroSection() {
+/* ═══════════════════════════════════════════
+   ABOUT (Bento Grid)
+   ═══════════════════════════════════════════ */
+
+function About() {
   return (
-    <section className="bg-white py-20 md:py-28 px-6 md:px-10">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
-        <div>
-          <h4 className="text-xl md:text-2xl font-display font-medium leading-relaxed">
-            Helping brands to stand out in the{" "}
-            <span className="text-[#999]">digital era.</span> Together we will
-            set the new status quo. No nonsense, always on the cutting edge.
-          </h4>
+    <section id="about" className="py-24 md:py-36 px-6 md:px-10">
+      <div className="max-w-7xl mx-auto">
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-xs font-mono text-[#ff6b35] tracking-widest uppercase">01</span>
+          <div className="w-12 h-px bg-white/10" />
+          <span className="text-xs tracking-[0.2em] text-white/30 uppercase">About</span>
         </div>
-        <div className="flex items-end">
-          <p className="text-base md:text-lg text-[#666] leading-relaxed">
-            The combination of my passion for design, code & interaction
-            positions me in a unique place in the web design world.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
+        <h2 className="text-3xl md:text-5xl font-display font-700 mb-16 max-w-2xl">
+          A brief intro,{" "}
+          <span className="gradient-text">who I am</span>
+        </h2>
 
-/* ─── Works Section ─── */
-function WorksSection() {
-  const [hoveredWork, setHoveredWork] = useState<number | null>(null);
-
-  return (
-    <section id="works" className="bg-white py-16 md:py-24 px-6 md:px-10">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-xs uppercase tracking-[0.2em] text-[#999] mb-12">
-          Recent Works
-        </div>
-
-        {/* Work list */}
-        <div className="space-y-0">
-          {WORKS.map((work, i) => (
-            <div
-              key={work.title}
-              className="group relative"
-              onMouseEnter={() => setHoveredWork(i)}
-              onMouseLeave={() => setHoveredWork(null)}
-            >
-              <a
-                href="#"
-                className="flex items-center justify-between py-6 md:py-8 border-t border-[#eee] hover:bg-[#fafafa] transition-colors duration-300 px-2 md:px-4 -mx-2 md:-mx-4"
-              >
-                <div className="flex items-center gap-4 md:gap-6">
-                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-medium group-hover:translate-x-2 transition-transform duration-300">
-                    {work.title}
-                  </h2>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-[#999]">{work.category}</span>
-                  <span className="text-sm text-[#999]">{work.year}</span>
-                </div>
-              </a>
-
-              {/* Hover image preview */}
-              <div
-                className={`absolute right-0 md:right-10 top-1/2 -translate-y-1/2 w-48 md:w-72 h-32 md:h-48 rounded-xl overflow-hidden pointer-events-none transition-all duration-500 z-10 ${
-                  hoveredWork === i
-                    ? "opacity-100 scale-100"
-                    : "opacity-0 scale-90"
-                }`}
-              >
-                <Image
-                  src={work.image}
-                  alt={work.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          ))}
-          {/* Bottom border for last item */}
-          <div className="border-t border-[#eee]" />
-        </div>
-
-        {/* CTA button */}
-        <div className="mt-10">
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#0a0a0a] text-white text-sm font-medium rounded-full hover:bg-[#333] transition-colors"
-          >
-            More Works Coming Soon!
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── About Section ─── */
-function AboutSection() {
-  return (
-    <section id="about" className="bg-white py-16 md:py-24 px-6 md:px-10">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-xs uppercase tracking-[0.2em] text-[#999] mb-8">
-          Who Am I
-        </div>
-        <p className="text-lg md:text-xl lg:text-2xl leading-relaxed max-w-4xl">
-          <span className="font-medium">Usman Milas</span> — Is a freelance
-          web <span className="text-[#999]">designer</span> from Sri Lanka with
-          over 4 years of hands-on experience, currently pursuing an HND in IT,
-          specializing in modern, responsive, and user-focused website design.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Portfolio Grid Section ─── */
-function PortfolioGrid() {
-  return (
-    <section className="bg-white py-16 md:py-24 px-6 md:px-10">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {PORTFOLIO_IMAGES.map((img, i) => (
-            <div
-              key={i}
-              className="group relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer"
-            >
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Portrait card — spans 1 col, 2 rows on lg */}
+          <div className="bento-card lg:row-span-2 relative group">
+            <div className="aspect-[3/4] lg:aspect-auto lg:h-full relative overflow-hidden">
               <Image
-                src={img}
-                alt={`Portfolio work ${i + 1}`}
+                src="/portrait-2026.jpg"
+                alt="Usman Milas portrait"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <h3 className="text-xl font-display font-700">Usman Milas</h3>
+              <p className="text-sm text-white/40 mt-1">Freelance Designer & Developer</p>
+            </div>
+          </div>
+
+          {/* Bio card — spans 2 cols */}
+          <div className="bento-card lg:col-span-2 p-8 md:p-10 flex flex-col justify-center">
+            <p className="text-lg md:text-xl text-white/60 leading-relaxed mb-6">
+              I&apos;m a freelance web designer and developer from Sri Lanka with
+              over 4 years of hands-on experience. Currently pursuing an HND in IT,
+              I specialize in crafting modern, responsive, and user-focused digital
+              experiences that help brands stand out.
+            </p>
+            <p className="text-lg md:text-xl text-white/60 leading-relaxed">
+              The combination of my passion for <span className="text-white font-medium">design</span>,{" "}
+              <span className="text-white font-medium">code</span> &{" "}
+              <span className="text-white font-medium">interaction</span> positions me
+              in a unique place in the web design world. Together we will set the new
+              status quo — no nonsense, always on the cutting edge.
+            </p>
+          </div>
+
+          {/* Stats cards */}
+          <div className="bento-card p-8 flex flex-col justify-between">
+            <span className="text-5xl md:text-6xl font-display font-800 gradient-text">4+</span>
+            <div>
+              <p className="text-sm text-white/40 mt-2">Years of</p>
+              <p className="text-sm text-white/70">Experience</p>
+            </div>
+          </div>
+
+          <div className="bento-card p-8 flex flex-col justify-between">
+            <span className="text-5xl md:text-6xl font-display font-800 gradient-text">50+</span>
+            <div>
+              <p className="text-sm text-white/40 mt-2">Projects</p>
+              <p className="text-sm text-white/70">Delivered</p>
+            </div>
+          </div>
+
+          <div className="bento-card p-8 flex flex-col justify-between">
+            <span className="text-5xl md:text-6xl font-display font-800 gradient-text">30+</span>
+            <div>
+              <p className="text-sm text-white/40 mt-2">Happy</p>
+              <p className="text-sm text-white/70">Clients</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   WORK
+   ═══════════════════════════════════════════ */
+
+function Work() {
+  const [activeProject, setActiveProject] = useState(0);
+
+  return (
+    <section id="work" className="py-24 md:py-36 px-6 md:px-10">
+      <div className="max-w-7xl mx-auto">
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-xs font-mono text-[#ff6b35] tracking-widest uppercase">02</span>
+          <div className="w-12 h-px bg-white/10" />
+          <span className="text-xs tracking-[0.2em] text-white/30 uppercase">Selected Work</span>
+        </div>
+        <h2 className="text-3xl md:text-5xl font-display font-700 mb-16 max-w-2xl">
+          Projects I&apos;m{" "}
+          <span className="gradient-text">proud of</span>
+        </h2>
+
+        {/* Project showcase */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Project list */}
+          <div className="space-y-2">
+            {PROJECTS.map((project, i) => (
+              <button
+                key={project.title}
+                onClick={() => setActiveProject(i)}
+                className={`w-full text-left p-6 md:p-8 rounded-2xl transition-all duration-400 group ${
+                  activeProject === i
+                    ? "bg-white/[0.04] border border-white/[0.08]"
+                    : "bg-transparent border border-transparent hover:bg-white/[0.02]"
+                }`}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <span className="text-xs font-mono text-[#ff6b35]/60">{project.number || `0${i + 1}`}</span>
+                    <h3 className={`text-2xl md:text-3xl font-display font-700 mt-1 transition-colors ${
+                      activeProject === i ? "gradient-text" : "text-white/40 group-hover:text-white/70"
+                    }`}>
+                      {project.title}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs text-white/20 px-2.5 py-1 rounded-full border border-white/[0.06]">{project.tag}</span>
+                    <span className="text-xs text-white/20">{project.year}</span>
+                  </div>
+                </div>
+                <p className={`text-sm leading-relaxed transition-colors ${
+                  activeProject === i ? "text-white/50" : "text-white/20"
+                }`}>
+                  {project.desc}
+                </p>
+                {activeProject === i && (
+                  <div className="flex gap-2 mt-4">
+                    {project.tools.map((tool) => (
+                      <span key={tool} className="text-xs text-white/30 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06]">
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Project preview image */}
+          <div className="relative aspect-[4/3] lg:aspect-auto rounded-2xl overflow-hidden bento-card border-0">
+            <Image
+              src={PROJECTS[activeProject].image}
+              alt={PROJECTS[activeProject].title}
+              fill
+              className="object-cover transition-all duration-700"
+              key={activeProject}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/60 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+              <h3 className="text-2xl md:text-3xl font-display font-700 gradient-text">
+                {PROJECTS[activeProject].title}
+              </h3>
+              <p className="text-sm text-white/40 mt-1">
+                {PROJECTS[activeProject].tag} — {PROJECTS[activeProject].year}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   SERVICES
+   ═══════════════════════════════════════════ */
+
+function Services() {
+  return (
+    <section id="services" className="py-24 md:py-36 px-6 md:px-10">
+      <div className="max-w-7xl mx-auto">
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-xs font-mono text-[#ff6b35] tracking-widest uppercase">03</span>
+          <div className="w-12 h-px bg-white/10" />
+          <span className="text-xs tracking-[0.2em] text-white/30 uppercase">What I Do</span>
+        </div>
+        <h2 className="text-3xl md:text-5xl font-display font-700 mb-16 max-w-2xl">
+          Services &{" "}
+          <span className="gradient-text">expertise</span>
+        </h2>
+
+        {/* Service cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {SERVICES.map((service) => (
+            <div key={service.number} className="bento-card p-8 md:p-10 group">
+              <div className="flex items-center justify-between mb-8">
+                <span className="text-4xl md:text-5xl font-display font-800 text-white/[0.04] group-hover:text-[#ff6b35]/10 transition-colors duration-500">
+                  {service.number}
+                </span>
+                <div className="w-10 h-10 rounded-full border border-white/[0.06] flex items-center justify-center group-hover:border-[#ff6b35]/30 group-hover:bg-[#ff6b35]/5 transition-all duration-300">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white/20 group-hover:text-[#ff6b35] transition-colors">
+                    <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="text-xl md:text-2xl font-display font-700 mb-4 group-hover:text-[#ff6b35] transition-colors duration-300">
+                {service.title}
+              </h3>
+              <p className="text-sm text-white/30 leading-relaxed mb-6">
+                {service.desc}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {service.tags.map((tag) => (
+                  <span key={tag} className="text-xs text-white/20 px-3 py-1.5 rounded-full bg-white/[0.02] border border-white/[0.04]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           ))}
         </div>
+
+        {/* Tech stack marquee */}
+        <div className="mt-16 overflow-hidden py-4 border-y border-white/[0.04]">
+          <div className="animate-marquee whitespace-nowrap flex">
+            {[...Array(2)].map((_, si) => (
+              <span key={si} className="flex-shrink-0 flex items-center">
+                {TECH_STACK.map((tech, i) => (
+                  <span key={`${si}-${i}`} className="mx-8 text-lg md:text-xl font-display font-600 text-white/[0.06] hover:text-white/20 transition-colors cursor-default">
+                    {tech}
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-/* ─── Footer / CTA Section ─── */
-function FooterSection() {
+/* ═══════════════════════════════════════════
+   CONTACT
+   ═══════════════════════════════════════════ */
+
+function Contact() {
+  const [sent, setSent] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSent(true);
+    setTimeout(() => setSent(false), 4000);
+    setFormData({ name: "", email: "", message: "" });
+  };
+
   return (
-    <section id="contact" className="bg-[#0a0a0a] text-white">
-      {/* CTA area */}
-      <div className="px-6 md:px-10 py-20 md:py-32">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-            <div>
-              <div className="flex items-center gap-4 flex-wrap">
-                <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-medium leading-none">
-                  Let&apos;s work
-                </h2>
-                <span className="text-sm md:text-base font-medium text-white/40 border border-white/20 px-3 py-1 rounded-full">
-                  WordPress
-                </span>
-              </div>
-              <div className="flex items-center gap-4 flex-wrap mt-2">
-                <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-medium leading-none">
-                  together
-                </h2>
-                <span className="text-sm md:text-base font-medium text-white/40 border border-white/20 px-3 py-1 rounded-full">
-                  Webflow
-                </span>
-                <span className="text-sm md:text-base font-medium text-white/40 border border-white/20 px-3 py-1 rounded-full">
-                  Wix
-                </span>
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="text-white/60 ml-2">
-                  <path d="M10 30L30 10M30 10H18M30 10V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </div>
-          </div>
+    <section id="contact" className="py-24 md:py-36 px-6 md:px-10 relative">
+      {/* Background glow */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[#ff6b35]/[0.03] blur-[120px] pointer-events-none" />
 
-          {/* Get in touch button */}
-          <div className="mt-12">
-            <a
-              href="mailto:Webworks456@gmail.com"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#3366ff] text-white text-sm font-medium rounded-full hover:bg-[#2952e6] transition-colors"
-            >
-              Get In Touch
-            </a>
-          </div>
-
-          {/* Email */}
-          <div className="mt-8">
-            <a href="mailto:Webworks456@gmail.com" className="text-sm text-white/50 hover:text-white transition-colors">
-              Webworks456@gmail.com
-            </a>
-          </div>
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-xs font-mono text-[#ff6b35] tracking-widest uppercase">04</span>
+          <div className="w-12 h-px bg-white/10" />
+          <span className="text-xs tracking-[0.2em] text-white/30 uppercase">Contact</span>
         </div>
-      </div>
 
-      {/* Footer bottom */}
-      <div className="border-t border-white/10 px-6 md:px-10 py-8">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+          {/* Left */}
           <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-white/30 mb-2">
-              Start Project
-            </div>
-            <a
-              href="https://www.fiverr.com/webworks_456/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-white/60 hover:text-white transition-colors"
-            >
-              Fiverr webworks456
-            </a>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-white/30 mb-2">
-              Socials
-            </div>
-            <div className="flex gap-6">
-              {SOCIALS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-white/60 hover:text-white transition-colors"
-                >
-                  {s.label}
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-800 leading-[0.95] mb-8">
+              Let&apos;s build
+              <br />
+              <span className="gradient-text">something</span>
+              <br />
+              great together
+            </h2>
+            <p className="text-lg text-white/30 mb-12 max-w-md">
+              Have a project in mind or just want to chat? I&apos;d love to hear from you. Let&apos;s turn your vision into reality.
+            </p>
+
+            {/* Quick links */}
+            <div className="space-y-6">
+              <div>
+                <span className="text-xs uppercase tracking-[0.2em] text-white/20">Email</span>
+                <a href="mailto:Webworks456@gmail.com" className="block text-lg text-white/60 hover:text-[#ff6b35] transition-colors mt-1">
+                  Webworks456@gmail.com
                 </a>
-              ))}
+              </div>
+              <div>
+                <span className="text-xs uppercase tracking-[0.2em] text-white/20">Hire Me</span>
+                <a href="https://www.fiverr.com/webworks_456/" target="_blank" rel="noopener noreferrer"
+                  className="block text-lg text-white/60 hover:text-[#ff6b35] transition-colors mt-1">
+                  Fiverr.com/webworks456
+                </a>
+              </div>
+              <div>
+                <span className="text-xs uppercase tracking-[0.2em] text-white/20 mb-3 block">Connect</span>
+                <div className="flex gap-3">
+                  {SOCIAL_LINKS.map((s) => (
+                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                      className="px-4 py-2 rounded-full text-xs border border-white/[0.06] text-white/30 hover:border-[#ff6b35]/30 hover:text-[#ff6b35] transition-all">
+                      {s.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          <div className="text-xs text-white/20">
-            © {new Date().getFullYear()} Usman Milas
+
+          {/* Right — Form */}
+          <div className="bento-card p-8 md:p-10">
+            {sent ? (
+              <div className="flex flex-col items-center justify-center h-full py-16">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ff6b35] to-[#c084fc] flex items-center justify-center mb-6 animate-scale-in">
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <path d="M6 14L12 20L22 8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-display font-700 mb-2">Message Sent!</h3>
+                <p className="text-sm text-white/30">I&apos;ll get back to you within 24 hours.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Name</label>
+                  <input
+                    id="name" type="text" required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-[#ff6b35]/30 focus:ring-1 focus:ring-[#ff6b35]/10 transition-all"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Email</label>
+                  <input
+                    id="email" type="email" required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-[#ff6b35]/30 focus:ring-1 focus:ring-[#ff6b35]/10 transition-all"
+                    placeholder="you@email.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Message</label>
+                  <textarea
+                    id="message" required rows={5}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-[#ff6b35]/30 focus:ring-1 focus:ring-[#ff6b35]/10 transition-all resize-none"
+                    placeholder="Tell me about your project..."
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#ff6b35] to-[#ff8f5e] text-white font-display font-600 text-sm tracking-wide hover:shadow-[0_0_40px_rgba(255,107,53,0.25)] transition-all duration-500"
+                >
+                  Send Message
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
@@ -456,7 +682,49 @@ function FooterSection() {
   );
 }
 
-/* ─── Main Page ─── */
+/* ═══════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════ */
+
+function Footer() {
+  return (
+    <footer className="border-t border-white/[0.04] px-6 md:px-10 py-10">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          {/* Left */}
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#ff6b35] to-[#c084fc] flex items-center justify-center">
+              <span className="text-[10px] font-display font-800 text-white">U</span>
+            </div>
+            <span className="text-sm text-white/20">
+              © {new Date().getFullYear()} Usman Milas
+            </span>
+          </div>
+
+          {/* Center - Proud */}
+          <p className="text-xs text-white/15 text-center">
+            Proudly designing from Sri Lanka 🇱🇰
+          </p>
+
+          {/* Right - Socials */}
+          <div className="flex items-center gap-5">
+            {SOCIAL_LINKS.map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                className="text-xs text-white/20 hover:text-[#ff6b35] transition-colors">
+                {s.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   MAIN PAGE
+   ═══════════════════════════════════════════ */
+
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -465,34 +733,23 @@ export default function HomePage() {
     setLoading(false);
   }, []);
 
-  // Lock scroll when menu is open
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
   return (
     <>
-      {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
-      <div
-        className={`min-h-screen transition-opacity duration-500 ${
-          loading ? "opacity-0" : "opacity-100"
-        }`}
-      >
-        <Navigation menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      {loading && <Loader onComplete={handleLoadingComplete} />}
+      <div className={`noise min-h-screen transition-opacity duration-700 ${loading ? "opacity-0" : "opacity-100"}`}>
+        <Nav menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
         <main>
-          <HeroSection />
-          <IntroSection />
-          <WorksSection />
-          <AboutSection />
-          <PortfolioGrid />
-          <FooterSection />
+          <Hero />
+          <About />
+          <Work />
+          <Services />
+          <Contact />
+          <Footer />
         </main>
       </div>
     </>
