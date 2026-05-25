@@ -15,6 +15,7 @@ const PROJECTS = [
     image: "/project-1.jpg",
     desc: "Premium fashion e-commerce with immersive product storytelling and seamless purchasing flow.",
     tools: ["Webflow", "Custom JS"],
+    size: "large",
   },
   {
     title: "LangChain",
@@ -23,6 +24,7 @@ const PROJECTS = [
     image: "/project-2.jpg",
     desc: "AI-powered platform with dynamic data visualization and real-time collaboration interfaces.",
     tools: ["Next.js", "Tailwind"],
+    size: "small",
   },
   {
     title: "SalzCorp",
@@ -31,6 +33,7 @@ const PROJECTS = [
     image: "/project-3.jpg",
     desc: "Corporate brand identity with cutting-edge animations and responsive design system.",
     tools: ["WordPress", "GSAP"],
+    size: "small",
   },
   {
     title: "Airnet&Co",
@@ -39,6 +42,7 @@ const PROJECTS = [
     image: "/project-4.jpg",
     desc: "Digital agency portfolio featuring creative transitions, 3D elements, and interactive storytelling.",
     tools: ["Webflow", "Three.js"],
+    size: "large",
   },
 ];
 
@@ -201,13 +205,12 @@ function Nav({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (v: bo
         style={{ transition: "opacity 0.5s ease" }}
       >
         <nav className="flex flex-col items-center gap-6">
-          {["About", "Work", "Services", "Contact"].map((link, i) => (
+          {["About", "Work", "Services", "Contact"].map((link) => (
             <a
               key={link}
               href={`#${link.toLowerCase()}`}
               onClick={() => setMenuOpen(false)}
               className="text-4xl font-display font-700 gradient-text-subtle hover:gradient-text transition-all"
-              style={{ animationDelay: `${i * 0.08}s` }}
             >
               {link}
             </a>
@@ -227,63 +230,116 @@ function Nav({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (v: bo
 }
 
 /* ═══════════════════════════════════════════
-   HERO
+   HERO — Split-screen Editorial Layout
    ═══════════════════════════════════════════ */
 
 function Hero() {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex items-stretch overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
-        <Image src="/hero-2026.jpg" alt="" fill className="object-cover opacity-20" priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/50 via-[#050505]/70 to-[#050505]" />
+        <Image src="/hero-2026.jpg" alt="" fill className="object-cover opacity-15" priority />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/90 to-[#050505]/70" />
       </div>
 
       {/* Decorative gradient orbs */}
-      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#ff6b35]/[0.04] blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full bg-[#c084fc]/[0.03] blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] rounded-full bg-[#ff6b35]/[0.04] blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full bg-[#c084fc]/[0.03] blur-[100px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-32 pb-20 w-full">
-        {/* Available badge */}
-        <div className="flex items-center gap-3 mb-8 animate-fade-in-up">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b35] opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff6b35]" />
-          </span>
-          <span className="text-sm text-white/50 tracking-wide">Available for freelance work</span>
+      <div className="relative z-10 w-full flex flex-col lg:flex-row items-stretch">
+        {/* Left side — Text */}
+        <div className="flex-1 flex flex-col justify-center px-6 md:px-10 lg:px-16 pt-28 pb-12 lg:py-0">
+          {/* Available badge */}
+          <div className="flex items-center gap-3 mb-8 animate-fade-in-up">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6b35] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff6b35]" />
+            </span>
+            <span className="text-sm text-white/50 tracking-wide">Available for freelance work</span>
+          </div>
+
+          {/* Main heading */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[6rem] font-display font-800 leading-[0.92] tracking-tight mb-8 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
+            Crafting
+            <br />
+            <span className="gradient-text">digital</span> experiences
+            <br />
+            that <span className="italic font-500 text-white/60">matter</span>
+          </h1>
+
+          {/* Subline */}
+          <p className="text-lg md:text-xl text-white/40 max-w-md mb-10 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
+            Freelance designer & developer from Sri Lanka — building modern, responsive, and unforgettable websites.
+          </p>
+
+          {/* CTA buttons */}
+          <div className="flex flex-wrap gap-4 animate-fade-in-up" style={{ animationDelay: "0.45s" }}>
+            <a
+              href="#work"
+              className="group inline-flex items-center gap-3 px-7 py-4 rounded-full bg-gradient-to-r from-[#ff6b35] to-[#ff8f5e] text-white text-sm font-medium hover:shadow-[0_0_40px_rgba(255,107,53,0.3)] transition-all duration-500"
+            >
+              View My Work
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:translate-x-1 transition-transform">
+                <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-sm font-medium border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all"
+            >
+              Get In Touch
+            </a>
+          </div>
+
+          {/* Bottom stats row */}
+          <div className="flex items-center gap-8 mt-14 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
+            {[
+              { value: "4+", label: "Years" },
+              { value: "50+", label: "Projects" },
+              { value: "30+", label: "Clients" },
+            ].map((stat, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className="text-2xl md:text-3xl font-display font-800 gradient-text">{stat.value}</span>
+                <span className="text-xs text-white/20 uppercase tracking-widest">{stat.label}</span>
+                {i < 2 && <div className="w-px h-6 bg-white/[0.06] ml-5" />}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Main heading */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[6.5rem] font-display font-800 leading-[0.95] tracking-tight mb-8 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
-          Crafting
-          <br />
-          <span className="gradient-text">digital</span> experiences
-          <br />
-          that <span className="italic font-500 text-white/60">matter</span>
-        </h1>
-
-        {/* Subline */}
-        <p className="text-lg md:text-xl text-white/40 max-w-xl mb-12 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
-          Freelance designer & developer from Sri Lanka — building modern, responsive, and unforgettable websites.
-        </p>
-
-        {/* CTA buttons */}
-        <div className="flex flex-wrap gap-4 animate-fade-in-up" style={{ animationDelay: "0.45s" }}>
-          <a
-            href="#work"
-            className="group inline-flex items-center gap-3 px-7 py-4 rounded-full bg-gradient-to-r from-[#ff6b35] to-[#ff8f5e] text-white text-sm font-medium hover:shadow-[0_0_40px_rgba(255,107,53,0.3)] transition-all duration-500"
-          >
-            View My Work
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="group-hover:translate-x-1 transition-transform">
-              <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-sm font-medium border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all"
-          >
-            Get In Touch
-          </a>
+        {/* Right side — Portrait */}
+        <div className="hidden lg:flex flex-1 items-end justify-end relative">
+          <div className="relative w-full h-[85vh] max-w-lg mr-10">
+            <div className="absolute inset-0 rounded-3xl overflow-hidden border border-white/[0.04]">
+              <Image
+                src="/portrait-2026.jpg"
+                alt="Usman Milas portrait"
+                fill
+                className="object-cover object-top"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/20 to-transparent" />
+            </div>
+            {/* Floating label on portrait */}
+            <div className="absolute bottom-8 left-8 right-8 z-10">
+              <div className="glass-card rounded-2xl p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-display font-700">Usman Milas</h3>
+                    <p className="text-xs text-white/40 mt-0.5">Designer & Developer</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {SOCIAL_LINKS.slice(0, 3).map((s) => (
+                      <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center text-white/20 hover:text-[#ff6b35] hover:border-[#ff6b35]/30 transition-all text-xs">
+                        {s.label[0]}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -307,7 +363,7 @@ function Hero() {
 }
 
 /* ═══════════════════════════════════════════
-   ABOUT (Bento Grid)
+   ABOUT — Horizontal Editorial Layout
    ═══════════════════════════════════════════ */
 
 function About() {
@@ -325,11 +381,11 @@ function About() {
           <span className="gradient-text">who I am</span>
         </h2>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Portrait card — spans 1 col, 2 rows on lg */}
-          <div className="bento-card lg:row-span-2 relative group">
-            <div className="aspect-[3/4] lg:aspect-auto lg:h-full relative overflow-hidden">
+        {/* Horizontal editorial layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Portrait — 5 cols */}
+          <div className="lg:col-span-5 bento-card relative group overflow-hidden">
+            <div className="aspect-[4/5] relative">
               <Image
                 src="/portrait-2026.jpg"
                 alt="Usman Milas portrait"
@@ -338,51 +394,56 @@ function About() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-6">
-              <h3 className="text-xl font-display font-700">Usman Milas</h3>
-              <p className="text-sm text-white/40 mt-1">Freelance Designer & Developer</p>
+            {/* Floating stats on image */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between">
+              <div>
+                <h3 className="text-xl font-display font-700">Usman Milas</h3>
+                <p className="text-sm text-white/40 mt-1">Freelance Designer & Developer</p>
+              </div>
+              <div className="flex gap-3">
+                {["4+ Yrs", "50+ Projects", "30+ Clients"].map((stat) => (
+                  <span key={stat} className="text-xs text-white/30 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] hidden sm:inline-block">
+                    {stat}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Bio card — spans 2 cols */}
-          <div className="bento-card lg:col-span-2 p-8 md:p-10 flex flex-col justify-center">
-            <p className="text-lg md:text-xl text-white/60 leading-relaxed mb-6">
-              I&apos;m a freelance web designer and developer from Sri Lanka with
-              over 4 years of hands-on experience. Currently pursuing an HND in IT,
-              I specialize in crafting modern, responsive, and user-focused digital
-              experiences that help brands stand out.
-            </p>
-            <p className="text-lg md:text-xl text-white/60 leading-relaxed">
-              The combination of my passion for <span className="text-white font-medium">design</span>,{" "}
-              <span className="text-white font-medium">code</span> &{" "}
-              <span className="text-white font-medium">interaction</span> positions me
-              in a unique place in the web design world. Together we will set the new
-              status quo — no nonsense, always on the cutting edge.
-            </p>
-          </div>
-
-          {/* Stats cards */}
-          <div className="bento-card p-8 flex flex-col justify-between">
-            <span className="text-5xl md:text-6xl font-display font-800 gradient-text">4+</span>
-            <div>
-              <p className="text-sm text-white/40 mt-2">Years of</p>
-              <p className="text-sm text-white/70">Experience</p>
+          {/* Bio + Stats — 7 cols */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+            {/* Bio text card */}
+            <div className="bento-card p-8 md:p-10 flex-1">
+              <p className="text-lg md:text-xl text-white/60 leading-relaxed mb-6">
+                I&apos;m a freelance web designer and developer from Sri Lanka with
+                over 4 years of hands-on experience. Currently pursuing an HND in IT,
+                I specialize in crafting modern, responsive, and user-focused digital
+                experiences that help brands stand out.
+              </p>
+              <p className="text-lg md:text-xl text-white/60 leading-relaxed">
+                The combination of my passion for <span className="text-white font-medium">design</span>,{" "}
+                <span className="text-white font-medium">code</span> &{" "}
+                <span className="text-white font-medium">interaction</span> positions me
+                in a unique place in the web design world. Together we will set the new
+                status quo — no nonsense, always on the cutting edge.
+              </p>
             </div>
-          </div>
 
-          <div className="bento-card p-8 flex flex-col justify-between">
-            <span className="text-5xl md:text-6xl font-display font-800 gradient-text">50+</span>
-            <div>
-              <p className="text-sm text-white/40 mt-2">Projects</p>
-              <p className="text-sm text-white/70">Delivered</p>
-            </div>
-          </div>
-
-          <div className="bento-card p-8 flex flex-col justify-between">
-            <span className="text-5xl md:text-6xl font-display font-800 gradient-text">30+</span>
-            <div>
-              <p className="text-sm text-white/40 mt-2">Happy</p>
-              <p className="text-sm text-white/70">Clients</p>
+            {/* Stats row — 3 cards */}
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { value: "4+", label1: "Years of", label2: "Experience" },
+                { value: "50+", label1: "Projects", label2: "Delivered" },
+                { value: "30+", label1: "Happy", label2: "Clients" },
+              ].map((stat) => (
+                <div key={stat.label2} className="bento-card p-6 flex flex-col justify-between">
+                  <span className="text-3xl md:text-4xl font-display font-800 gradient-text">{stat.value}</span>
+                  <div>
+                    <p className="text-xs text-white/30 mt-2">{stat.label1}</p>
+                    <p className="text-xs text-white/50">{stat.label2}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -392,12 +453,10 @@ function About() {
 }
 
 /* ═══════════════════════════════════════════
-   WORK
+   WORK — Staggered Masonry Grid
    ═══════════════════════════════════════════ */
 
 function Work() {
-  const [activeProject, setActiveProject] = useState(0);
-
   return (
     <section id="work" className="py-24 md:py-36 px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
@@ -412,71 +471,53 @@ function Work() {
           <span className="gradient-text">proud of</span>
         </h2>
 
-        {/* Project showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Project list */}
-          <div className="space-y-2">
-            {PROJECTS.map((project, i) => (
-              <button
-                key={project.title}
-                onClick={() => setActiveProject(i)}
-                className={`w-full text-left p-6 md:p-8 rounded-2xl transition-all duration-400 group ${
-                  activeProject === i
-                    ? "bg-white/[0.04] border border-white/[0.08]"
-                    : "bg-transparent border border-transparent hover:bg-white/[0.02]"
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <span className="text-xs font-mono text-[#ff6b35]/60">{project.number || `0${i + 1}`}</span>
-                    <h3 className={`text-2xl md:text-3xl font-display font-700 mt-1 transition-colors ${
-                      activeProject === i ? "gradient-text" : "text-white/40 group-hover:text-white/70"
-                    }`}>
-                      {project.title}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs text-white/20 px-2.5 py-1 rounded-full border border-white/[0.06]">{project.tag}</span>
-                    <span className="text-xs text-white/20">{project.year}</span>
-                  </div>
+        {/* Staggered masonry grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {PROJECTS.map((project, i) => (
+            <div
+              key={project.title}
+              className={`group relative bento-card overflow-hidden cursor-pointer ${
+                project.size === "large" ? "md:row-span-1 aspect-[16/10]" : "aspect-[16/12]"
+              }`}
+            >
+              <Image
+                src={project.image}
+                alt={project.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Content overlay */}
+              <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-mono text-[#ff6b35]/60">{`0${i + 1}`}</span>
+                  <span className="text-xs text-white/20 px-2.5 py-1 rounded-full border border-white/[0.06]">{project.tag}</span>
+                  <span className="text-xs text-white/20">{project.year}</span>
                 </div>
-                <p className={`text-sm leading-relaxed transition-colors ${
-                  activeProject === i ? "text-white/50" : "text-white/20"
-                }`}>
+                <h3 className="text-2xl md:text-3xl font-display font-700 group-hover:gradient-text transition-all duration-300">
+                  {project.title}
+                </h3>
+                <p className="text-sm text-white/30 mt-2 max-w-md leading-relaxed opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-400">
                   {project.desc}
                 </p>
-                {activeProject === i && (
-                  <div className="flex gap-2 mt-4">
-                    {project.tools.map((tool) => (
-                      <span key={tool} className="text-xs text-white/30 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06]">
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
+                <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-75">
+                  {project.tools.map((tool) => (
+                    <span key={tool} className="text-xs text-white/30 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+              </div>
 
-          {/* Project preview image */}
-          <div className="relative aspect-[4/3] lg:aspect-auto rounded-2xl overflow-hidden bento-card border-0">
-            <Image
-              src={PROJECTS[activeProject].image}
-              alt={PROJECTS[activeProject].title}
-              fill
-              className="object-cover transition-all duration-700"
-              key={activeProject}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/60 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-              <h3 className="text-2xl md:text-3xl font-display font-700 gradient-text">
-                {PROJECTS[activeProject].title}
-              </h3>
-              <p className="text-sm text-white/40 mt-1">
-                {PROJECTS[activeProject].tag} — {PROJECTS[activeProject].year}
-              </p>
+              {/* Arrow icon top-right */}
+              <div className="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/[0.08] flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-400 bg-[#0a0a0a]/50 backdrop-blur-sm">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white/50">
+                  <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -484,7 +525,7 @@ function Work() {
 }
 
 /* ═══════════════════════════════════════════
-   SERVICES
+   SERVICES — Full-width Horizontal Strips
    ═══════════════════════════════════════════ */
 
 function Services() {
@@ -502,32 +543,41 @@ function Services() {
           <span className="gradient-text">expertise</span>
         </h2>
 
-        {/* Service cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Full-width horizontal strips */}
+        <div className="space-y-3">
           {SERVICES.map((service) => (
-            <div key={service.number} className="bento-card p-8 md:p-10 group">
-              <div className="flex items-center justify-between mb-8">
-                <span className="text-4xl md:text-5xl font-display font-800 text-white/[0.04] group-hover:text-[#ff6b35]/10 transition-colors duration-500">
+            <div key={service.number} className="bento-card group px-6 md:px-10 py-6 md:py-8">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                {/* Number */}
+                <span className="text-3xl md:text-5xl font-display font-800 text-white/[0.04] group-hover:text-[#ff6b35]/10 transition-colors duration-500 md:w-24 flex-shrink-0">
                   {service.number}
                 </span>
-                <div className="w-10 h-10 rounded-full border border-white/[0.06] flex items-center justify-center group-hover:border-[#ff6b35]/30 group-hover:bg-[#ff6b35]/5 transition-all duration-300">
+
+                {/* Title */}
+                <h3 className="text-xl md:text-2xl font-display font-700 group-hover:text-[#ff6b35] transition-colors duration-300 md:w-56 flex-shrink-0">
+                  {service.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-sm text-white/30 leading-relaxed flex-1">
+                  {service.desc}
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 flex-shrink-0">
+                  {service.tags.map((tag) => (
+                    <span key={tag} className="text-xs text-white/20 px-3 py-1.5 rounded-full bg-white/[0.02] border border-white/[0.04]">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Arrow */}
+                <div className="w-10 h-10 rounded-full border border-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:border-[#ff6b35]/30 group-hover:bg-[#ff6b35]/5 transition-all duration-300 hidden md:flex">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white/20 group-hover:text-[#ff6b35] transition-colors">
                     <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-              </div>
-              <h3 className="text-xl md:text-2xl font-display font-700 mb-4 group-hover:text-[#ff6b35] transition-colors duration-300">
-                {service.title}
-              </h3>
-              <p className="text-sm text-white/30 leading-relaxed mb-6">
-                {service.desc}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {service.tags.map((tag) => (
-                  <span key={tag} className="text-xs text-white/20 px-3 py-1.5 rounded-full bg-white/[0.02] border border-white/[0.04]">
-                    {tag}
-                  </span>
-                ))}
               </div>
             </div>
           ))}
@@ -553,7 +603,7 @@ function Services() {
 }
 
 /* ═══════════════════════════════════════════
-   CONTACT
+   CONTACT — Centered CTA + Split Form
    ═══════════════════════════════════════════ */
 
 function Contact() {
@@ -573,58 +623,55 @@ function Contact() {
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[#ff6b35]/[0.03] blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section header */}
-        <div className="flex items-center gap-4 mb-4">
-          <span className="text-xs font-mono text-[#ff6b35] tracking-widest uppercase">04</span>
-          <div className="w-12 h-px bg-white/10" />
-          <span className="text-xs tracking-[0.2em] text-white/30 uppercase">Contact</span>
+        {/* Big CTA heading centered */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <span className="text-xs font-mono text-[#ff6b35] tracking-widest uppercase">04</span>
+            <div className="w-12 h-px bg-white/10" />
+            <span className="text-xs tracking-[0.2em] text-white/30 uppercase">Contact</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-800 leading-[0.95] mb-6">
+            Let&apos;s build
+            <br />
+            <span className="gradient-text">something</span> great together
+          </h2>
+          <p className="text-lg text-white/30 max-w-lg mx-auto">
+            Have a project in mind or just want to chat? I&apos;d love to hear from you.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-          {/* Left */}
-          <div>
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-800 leading-[0.95] mb-8">
-              Let&apos;s build
-              <br />
-              <span className="gradient-text">something</span>
-              <br />
-              great together
-            </h2>
-            <p className="text-lg text-white/30 mb-12 max-w-md">
-              Have a project in mind or just want to chat? I&apos;d love to hear from you. Let&apos;s turn your vision into reality.
-            </p>
-
-            {/* Quick links */}
-            <div className="space-y-6">
-              <div>
-                <span className="text-xs uppercase tracking-[0.2em] text-white/20">Email</span>
-                <a href="mailto:Webworks456@gmail.com" className="block text-lg text-white/60 hover:text-[#ff6b35] transition-colors mt-1">
-                  Webworks456@gmail.com
-                </a>
-              </div>
-              <div>
-                <span className="text-xs uppercase tracking-[0.2em] text-white/20">Hire Me</span>
-                <a href="https://www.fiverr.com/webworks_456/" target="_blank" rel="noopener noreferrer"
-                  className="block text-lg text-white/60 hover:text-[#ff6b35] transition-colors mt-1">
-                  Fiverr.com/webworks456
-                </a>
-              </div>
-              <div>
-                <span className="text-xs uppercase tracking-[0.2em] text-white/20 mb-3 block">Connect</span>
-                <div className="flex gap-3">
-                  {SOCIAL_LINKS.map((s) => (
-                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-full text-xs border border-white/[0.06] text-white/30 hover:border-[#ff6b35]/30 hover:text-[#ff6b35] transition-all">
-                      {s.label}
-                    </a>
-                  ))}
-                </div>
+        {/* Form + Info in a new arrangement */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-5xl mx-auto">
+          {/* Left info panel — 4 cols */}
+          <div className="lg:col-span-4 space-y-4">
+            <div className="bento-card p-6">
+              <span className="text-xs uppercase tracking-[0.2em] text-white/20 block mb-2">Email</span>
+              <a href="mailto:Webworks456@gmail.com" className="text-base text-white/60 hover:text-[#ff6b35] transition-colors break-all">
+                Webworks456@gmail.com
+              </a>
+            </div>
+            <div className="bento-card p-6">
+              <span className="text-xs uppercase tracking-[0.2em] text-white/20 block mb-2">Hire Me</span>
+              <a href="https://www.fiverr.com/webworks_456/" target="_blank" rel="noopener noreferrer"
+                className="text-base text-white/60 hover:text-[#ff6b35] transition-colors">
+                Fiverr.com/webworks456
+              </a>
+            </div>
+            <div className="bento-card p-6">
+              <span className="text-xs uppercase tracking-[0.2em] text-white/20 block mb-3">Connect</span>
+              <div className="flex flex-wrap gap-2">
+                {SOCIAL_LINKS.map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-full text-xs border border-white/[0.06] text-white/30 hover:border-[#ff6b35]/30 hover:text-[#ff6b35] transition-all">
+                    {s.label}
+                  </a>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right — Form */}
-          <div className="bento-card p-8 md:p-10">
+          {/* Right form — 8 cols */}
+          <div className="lg:col-span-8 bento-card p-8 md:p-10">
             {sent ? (
               <div className="flex flex-col items-center justify-center h-full py-16">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ff6b35] to-[#c084fc] flex items-center justify-center mb-6 animate-scale-in">
@@ -636,26 +683,28 @@ function Contact() {
                 <p className="text-sm text-white/30">I&apos;ll get back to you within 24 hours.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Name</label>
-                  <input
-                    id="name" type="text" required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-[#ff6b35]/30 focus:ring-1 focus:ring-[#ff6b35]/10 transition-all"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Email</label>
-                  <input
-                    id="email" type="email" required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-[#ff6b35]/30 focus:ring-1 focus:ring-[#ff6b35]/10 transition-all"
-                    placeholder="you@email.com"
-                  />
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label htmlFor="name" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Name</label>
+                    <input
+                      id="name" type="text" required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-[#ff6b35]/30 focus:ring-1 focus:ring-[#ff6b35]/10 transition-all"
+                      placeholder="Your name"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Email</label>
+                    <input
+                      id="email" type="email" required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-white placeholder:text-white/10 focus:outline-none focus:border-[#ff6b35]/30 focus:ring-1 focus:ring-[#ff6b35]/10 transition-all"
+                      placeholder="you@email.com"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="message" className="block text-xs uppercase tracking-[0.15em] text-white/20 mb-3">Message</label>
@@ -683,30 +732,37 @@ function Contact() {
 }
 
 /* ═══════════════════════════════════════════
-   FOOTER
+   FOOTER — Minimal with big name
    ═══════════════════════════════════════════ */
 
 function Footer() {
   return (
-    <footer className="border-t border-white/[0.04] px-6 md:px-10 py-10">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Left */}
+    <footer className="border-t border-white/[0.04]">
+      {/* Big name row */}
+      <div className="px-6 md:px-10 py-12 md:py-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-5xl md:text-7xl lg:text-8xl font-display font-800 text-white/[0.03] select-none">
+            Usman Milas
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t border-white/[0.04] px-6 md:px-10 py-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#ff6b35] to-[#c084fc] flex items-center justify-center">
               <span className="text-[10px] font-display font-800 text-white">U</span>
             </div>
             <span className="text-sm text-white/20">
-              © {new Date().getFullYear()} Usman Milas
+              &copy; {new Date().getFullYear()} Usman Milas
             </span>
           </div>
 
-          {/* Center - Proud */}
           <p className="text-xs text-white/15 text-center">
-            Proudly designing from Sri Lanka 🇱🇰
+            Proudly designing from Sri Lanka
           </p>
 
-          {/* Right - Socials */}
           <div className="flex items-center gap-5">
             {SOCIAL_LINKS.map((s) => (
               <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
