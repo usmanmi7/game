@@ -463,23 +463,23 @@ export class GameEngine {
     }
   }
 
-  // Get tree render dimensions based on size (2x bigger)
+  // Get tree render dimensions based on size (1.3x original)
   getTreeDimensions(treeSize?: TreeSize): { width: number; height: number; offsetX: number; offsetY: number } {
     switch (treeSize) {
       case TreeSize.SMALL:
-        return { width: 112, height: 144, offsetX: -32, offsetY: -96 };
+        return { width: 74, height: 94, offsetX: -13, offsetY: -46 };
       case TreeSize.LARGE:
-        return { width: 192, height: 224, offsetX: -72, offsetY: -176 };
+        return { width: 126, height: 146, offsetX: -39, offsetY: -98 };
       case TreeSize.MEDIUM:
       default:
-        return { width: 152, height: 184, offsetX: -52, offsetY: -136 };
+        return { width: 94, height: 114, offsetX: -23, offsetY: -66 };
     }
   }
 
-  // Calculate wind sway offset for trees (2x bigger = more sway)
+  // Calculate wind sway offset for trees
   getWindSway(x: number, _y: number, treeSize?: TreeSize): number {
-    const intensity = treeSize === TreeSize.LARGE ? 8 : treeSize === TreeSize.MEDIUM ? 6 : 4;
-    const frequency = 1.2;
+    const intensity = treeSize === TreeSize.LARGE ? 5 : treeSize === TreeSize.MEDIUM ? 4 : 3;
+    const frequency = 1.3;
     const phase = x * 0.01;
     return Math.sin(this.windTime * frequency + phase) * intensity;
   }
